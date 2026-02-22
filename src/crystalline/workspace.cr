@@ -78,8 +78,14 @@ class Crystalline::Workspace
     @opened_documents[params.text_document.uri]?.try { |document|
       range = params.range
       contents_lines = document.contents.lines(chomp: false)[range.start.line..range.end.line]
-      contents_lines[-1] = contents_lines.last[...range.end.character] if range.end.character > 0
-      contents_lines[0] = contents_lines.first[range.start.character...]
+      if range.start.line == range.end.line
+        line = contents_lines[0]
+        end_char = range.end.character > 0 ? range.end.character : line.size
+        contents_lines[0] = line[range.start.character...end_char]
+      else
+        contents_lines[-1] = contents_lines.last[...range.end.character] if range.end.character > 0
+        contents_lines[0] = contents_lines.first[range.start.character...]
+      end
       {Crystal.format(contents_lines.join), document}
     }
   rescue e
