@@ -19,12 +19,17 @@ jobs:
       - uses: crystal-lang/install-crystal@v1
         with:
           crystal: 1.19.1
+      - name: Install LLVM
+        if: runner.os == 'macOS'
+        run: brew install llvm@20
       - run: shards install
       - name: Lint
         run: crystal run lib/ameba/src/cli.cr -- -c .ameba.yml
       - name: Run tests
         run: crystal spec
       - name: Verify build
+        env:
+          LLVM_CONFIG: ${{ runner.os == 'macOS' && '/opt/homebrew/opt/llvm@20/bin/llvm-config' || '' }}
         run: shards build crystalline --no-debug -Dpreview_mt --progress
 
   docker:

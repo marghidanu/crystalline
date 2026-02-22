@@ -14,8 +14,12 @@ jobs:
       - uses: crystal-lang/install-crystal@v1
         with:
           crystal: 1.19.1
+      - name: Install LLVM
+        run: brew install llvm@20
       - run: shards install --production
       - name: Build
+        env:
+          LLVM_CONFIG: /opt/homebrew/opt/llvm@20/bin/llvm-config
         run: shards build crystalline --release --no-debug -Dpreview_mt --stats --progress
       - uses: actions/upload-artifact@v4
         with:
