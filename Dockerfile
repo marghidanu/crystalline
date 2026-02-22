@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Add static LLVM and system libs needed for static linking.
 RUN apk add --update --no-cache --force-overwrite \
-      llvm18-dev llvm18-static g++ libxml2-static zstd-static
+      llvm20-dev llvm20-static g++ libxml2-static zstd-static
 
 COPY . /app/
 
