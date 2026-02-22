@@ -10,7 +10,7 @@ COPY . /app/
 
 ARG RELEASE=true
 RUN shards build crystalline \
-      --no-debug --progress --stats --production --static \
+      --no-debug --production --static \
       ${RELEASE:+--release} \
       -Dpreview_mt
 

@@ -30,7 +30,7 @@ jobs:
       - name: Verify build
         env:
           LLVM_CONFIG: ${{ runner.os == 'macOS' && '/opt/homebrew/opt/llvm@20/bin/llvm-config' || '' }}
-        run: shards build crystalline --no-debug -Dpreview_mt --progress
+        run: shards build crystalline --no-debug -Dpreview_mt
 
   docker:
     name: Docker build
