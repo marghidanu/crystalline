@@ -404,18 +404,6 @@ view and the Breadcrumbs.
 
 ## Development
 
-### Dev build
-
-[Sentry](https://github.com/samueleaton/sentry) is used to re-build crystalline
-in debug mode on code change.
-
-```sh
-# To build sentry (once):
-shards build --release sentry
-# Then, to launch it and watch the filesystem:
-./bin/sentry -i
-```
-
 ### Logs
 
 Logging is the most practical way to debug the LSP.
@@ -425,13 +413,13 @@ Logging is the most practical way to debug the LSP.
 LSP::Log.info { "log" }
 ```
 
-Debug logs are deactivated by default, uncomment this line in
-`src/crystalline/main.cr` to enable them:
+Debug logs are deactivated by default. Pass the `--debug` flag to enable them:
 
-```crystal
-# Uncomment:
-# ::Log.setup(:debug, LSP::Log.backend.not_nil!)
+```sh
+crystalline --debug
 ```
+
+Debug logs are written to a `crystalline.log` file in the system temp directory.
 
 ## Contributing
 
