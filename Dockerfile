@@ -1,17 +1,21 @@
-FROM crystallang/crystal:1.16.1-alpine
+FROM crystallang/crystal:1.19.1-alpine AS build
 
 WORKDIR /app
 
-# Add llvm deps.
+# Add static LLVM and system libs needed for static linking.
 RUN apk add --update --no-cache --force-overwrite \
-      llvm18-dev llvm18-static g++ libxml2-static zstd-static make
+      llvm20-dev llvm20-static g++ libxml2-static zstd-static
 
-# Build crystalline.
 COPY . /app/
 
-RUN git clone -b 1.16.1 --depth=1 https://github.com/crystal-lang/crystal \
-      && make -C crystal llvm_ext \
-      && CRYSTAL_PATH=crystal/src:lib shards build crystalline \
-      --no-debug --progress --stats --production --static --release \
-      -Dpreview_mt --ignore-crystal-version \
-      && rm -rf crystal
+ARG RELEASE=true
+RUN shards build crystalline \
+      --no-debug --production --static \
+      ${RELEASE:+--release} \
+      -Dpreview_mt
+
+FROM alpine:3.21
+
+COPY --from=build /app/bin/crystalline /usr/local/bin/crystalline
+
+ENTRYPOINT ["crystalline"]

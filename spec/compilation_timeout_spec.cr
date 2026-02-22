@@ -51,20 +51,19 @@ describe "Buffered channel for compilation sync" do
 
   it "buffered(1) channel works normally with receiver" do
     ch = Channel(Int32?).new(1)
-    result = nil
 
     spawn do
       ch.send(42)
     end
 
-    select
+    received = select
     when value = ch.receive
-      result = value
+      value
     when timeout 1.seconds
-      result = nil
+      nil
     end
 
-    result.should eq(42)
+    received.should eq(42)
   end
 
   it "buffered(1) channel handles nil values" do
@@ -96,7 +95,7 @@ describe "Buffered channel for compilation sync" do
 
     # Simulate: receiver times out before sender finishes
     select
-    when value = ch.receive
+    when ch.receive
       fail "Should have timed out"
     when timeout 10.milliseconds
       # Timed out as expected

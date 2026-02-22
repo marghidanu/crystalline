@@ -37,10 +37,10 @@ describe "Completion range calculation" do
       position_character = 10
       left_offset = 3
       old_start_char = position_character - left_offset + 1 # old buggy
-      new_start_char = position_character - left_offset       # fixed
-      old_start_char.should eq(8) # wrong
-      new_start_char.should eq(7) # correct
-      (old_start_char - new_start_char).should eq(1) # off by exactly 1
+      new_start_char = position_character - left_offset     # fixed
+      old_start_char.should eq(8)                           # wrong
+      new_start_char.should eq(7)                           # correct
+      (old_start_char - new_start_char).should eq(1)        # off by exactly 1
     end
   end
 

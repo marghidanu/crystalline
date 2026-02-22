@@ -1,6 +1,6 @@
 class Crystalline::ResultCache
   # A monotonic timestamp used to store the invalidation date.
-  @@reference_clock = Time.monotonic
+  @@reference_clock = Time.instant
   # A cache of compiler results with invalidation time, indexed by file name.
   @cache : Hash(String, {Crystal::Compiler::Result?, Time::Span?}) = Hash(String, {Crystal::Compiler::Result?, Time::Span?}).new
 
@@ -42,6 +42,6 @@ class Crystalline::ResultCache
 
   # Return the current monotonic time.
   def monotonic_now
-    Time.monotonic - @@reference_clock
+    Time.instant - @@reference_clock
   end
 end
