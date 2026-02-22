@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crystal-lang/install-crystal@v1
+        with:
+          crystal: 1.19.1
+      - run: shards install
+      - name: Lint
+        run: crystal run lib/ameba/src/cli.cr -- -c .ameba.yml
+      - name: Run tests
+        run: crystal spec
+      - name: Verify build
+        run: shards build crystalline --no-debug -Dpreview_mt --progress
+
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t crystalline .

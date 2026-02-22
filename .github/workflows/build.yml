@@ -3,46 +3,53 @@ name: Build
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
-  schedule:
-    - cron: "0 0 10 * 6"
 
 jobs:
   macos:
-    strategy:
-      matrix:
-        runner: [macos-latest, macos-13]
-    runs-on: ${{ matrix.runner }}
+    name: macOS (arm64)
+    runs-on: macos-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Install Crystal
-        env:
-          HOMEBREW_NO_INSTALL_UPGRADE: 1
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
-        run: brew update && brew install crystal || true
-      - name: Build the binary
-        run: |
-          export LLVM_CONFIG="$(brew --prefix)/opt/llvm@20/bin/llvm-config"
-          shards build crystalline --release --no-debug -Dpreview_mt --stats --progress --ignore-crystal-version
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: crystal-lang/install-crystal@v1
         with:
-          name: crystalline_${{ matrix.runner == 'macos-latest' && 'arm64' || 'x86_64' }}-apple-darwin
+          crystal: 1.19.1
+      - run: shards install --production
+      - name: Build
+        run: shards build crystalline --release --no-debug -Dpreview_mt --stats --progress
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crystalline_arm64-apple-darwin
           path: ./bin/crystalline
+
   linux:
+    name: Linux (x86_64, static)
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Build the static binary
+      - uses: actions/checkout@v4
+      - name: Build static binary
         run: docker build -t crystalline .
-      - name: Copy binary to host
+      - name: Extract binary
         run: |
-          docker run -v $PWD:/app/host --rm crystalline:latest cp ./bin/crystalline ./host/crystalline
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v4
+          docker run -v $PWD:/out --rm crystalline:latest cp /usr/local/bin/crystalline /out/crystalline
+      - uses: actions/upload-artifact@v4
         with:
           name: crystalline_x86_64-unknown-linux-musl
           path: ./crystalline
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest
