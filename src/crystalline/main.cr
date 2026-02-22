@@ -44,11 +44,18 @@ module Crystalline
     end
   end
 
-  def self.init(*, input : IO = STDIN, output : IO = STDOUT)
+  class_property? debug : Bool = false
+
+  def self.init(*, input : IO = STDIN, output : IO = STDOUT, debug : Bool = false)
     EnvironmentConfig.run
-    {% if flag?(:debug) %}
-      ::Log.setup(:debug, LSP::Log.backend.not_nil!)
-    {% end %}
+    self.debug = debug
+    if debug
+      log_file = File.open(Path[Dir.tempdir, "crystalline.log"].to_s, "a")
+      log_file.sync = true
+      backend = ::Log::IOBackend.new(io: log_file)
+      ::Log.setup(:debug, backend)
+      LSP::Log.info { "Crystalline v#{VERSION} started in debug mode" }
+    end
     server = LSP::Server.new(input, output, SERVER_CAPABILITIES)
     Controller.new(server)
   rescue ex
