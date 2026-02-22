@@ -6,4 +6,4 @@ if ARGV.includes?("--version")
   exit
 end
 
-Crystalline.init
+Crystalline.init(debug: ARGV.includes?("--debug"))

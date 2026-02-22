@@ -32,6 +32,7 @@ class Crystalline::Controller
   # def on_request(message : LSP::RequestMessage(T)) : T forall T
   def on_request(message : LSP::RequestMessage)
     @pending_requests << message.id
+    LSP::Log.debug { "on_request: #{message.class.name} (id=#{message.id})" }
     case message
     when LSP::DocumentFormattingRequest
       @documents_lock.synchronize {
@@ -104,6 +105,7 @@ class Crystalline::Controller
   end
 
   def on_notification(message : LSP::NotificationMessage) : Nil
+    LSP::Log.debug { "on_notification: #{message.class.name}" }
     case message
     when LSP::DidOpenNotification
       @documents_lock.synchronize {
