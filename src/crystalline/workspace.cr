@@ -169,7 +169,7 @@ class Crystalline::Workspace
         return cached_result unless cached_result.nil? && discard_nil_cached_result
       end
 
-      sync_channel = Channel(Crystal::Compiler::Result?).new
+      sync_channel = Channel(Crystal::Compiler::Result?).new(1)
 
       progress.report(server) do
         file_overrides = nil
