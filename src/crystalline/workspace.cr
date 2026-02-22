@@ -71,7 +71,8 @@ class Crystalline::Workspace
       {Crystal.format(document.contents), document}
     }
   rescue e
-    # swallow exceptions silently
+    LSP::Log.error(exception: e) { "format_document: #{e.message}" }
+    nil
   end
 
   def format_document(params : LSP::DocumentRangeFormattingParams) : {String, TextDocument}?
@@ -83,7 +84,8 @@ class Crystalline::Workspace
       {Crystal.format(contents_lines.join), document}
     }
   rescue e
-    # swallow exceptions silently
+    LSP::Log.error(exception: e) { "format_document (range): #{e.message}" }
+    nil
   end
 
   # Run a top level semantic analysis to compute dependencies.
@@ -94,7 +96,8 @@ class Crystalline::Workspace
     Analysis.compile(server, target, lib_path: lib_path, ignore_diagnostics: true, wants_doc: false, top_level: true, compiler_flags: project.flags).try { |result|
       project.dependencies = result.program.requires
     }
-  rescue
+  rescue e
+    LSP::Log.error(exception: e) { "recalculate_dependencies: #{e.message}" }
     nil
   end
 
@@ -306,7 +309,8 @@ class Crystalline::Workspace
         ),
       )
     end
-  rescue
+  rescue e
+    LSP::Log.error(exception: e) { "hover: #{e.message}" }
     nil
   end
 
@@ -357,7 +361,8 @@ class Crystalline::Workspace
         end
       }
     end
-  rescue
+  rescue e
+    LSP::Log.error(exception: e) { "definitions: #{e.message}" }
     nil
   end
 
@@ -585,7 +590,8 @@ class Crystalline::Workspace
         items: completion_items,
       )
     end
-  rescue
+  rescue e
+    LSP::Log.error(exception: e) { "completion: #{e.message}" }
     nil
   end
 
