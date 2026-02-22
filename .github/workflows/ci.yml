@@ -33,4 +33,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build image
-        run: docker build -t crystalline .
+        run: docker build --build-arg RELEASE= -t crystalline .

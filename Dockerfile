@@ -8,8 +8,10 @@ RUN apk add --update --no-cache --force-overwrite \
 
 COPY . /app/
 
+ARG RELEASE=true
 RUN shards build crystalline \
-      --no-debug --progress --stats --production --static --release \
+      --no-debug --progress --stats --production --static \
+      ${RELEASE:+--release} \
       -Dpreview_mt
 
 FROM alpine:3.21
