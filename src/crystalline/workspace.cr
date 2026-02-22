@@ -421,7 +421,7 @@ class Crystalline::Workspace
     location = Crystal::Location.new(
       file_uri.decoded_path,
       line_number: position.line + 1,
-      column_number: position.character - left_offset
+      column_number: position.character - left_offset + 1
     )
 
     # Trigger a compilation that will not fail fast.
@@ -445,7 +445,7 @@ class Crystalline::Workspace
       LSP::Log.debug { "completion: node=#{n.class}, type=#{n.try &.type?}" }
 
       range = LSP::Range.new(
-        start: LSP::Position.new(line: position.line, character: position.character - left_offset + 1),
+        start: LSP::Position.new(line: position.line, character: position.character - left_offset),
         end: LSP::Position.new(line: position.line, character: position.character + right_offset),
       )
 
